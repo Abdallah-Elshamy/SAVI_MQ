@@ -25,7 +25,7 @@ def dashboard(request):
 
 
 def create(request):
-    return HttpResponse("Hello, world!")
+    return render(request, "createForm.html")
 
 
 def status(request, id):
