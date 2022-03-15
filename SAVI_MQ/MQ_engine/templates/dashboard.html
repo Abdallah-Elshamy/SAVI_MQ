@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+.button {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+.button-red {background-color: #f44336;} /* Red */ 
+</style>
+</head>
+<body>
+
+<h2>Instances</h2>
+<button class="button">Launch Instance</button>
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Endpoint</th>
+    <th>Dashboard URL</th>
+    <th>Flavor</th>
+    <th>Key Pair</th>
+    <th>Engine</th>
+    <th>Status</th>
+    <th>Actions</th>
+  </tr>
+  {% for instance in instances %}
+  <tr>
+    <td>{{ instance.Name }}</td>
+    <td>{{ instance.Endpoint }}</td>
+    <td>{{ instance.DashboardURL }}</td>
+    <td>{{ instance.Flavor }}</td>
+    <td>{{ instance.KeyPair }}</td>
+    <td>{{ instance.Engine }}</td>
+    <td>{{ instance.Status }}</td>
+    <td><button class="button button-red">Delete</button></td>
+  </tr>
+  {% endfor %}
+</table>
+
+</body>
+</html>
+
