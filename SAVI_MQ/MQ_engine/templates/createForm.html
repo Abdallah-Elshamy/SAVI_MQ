@@ -200,6 +200,7 @@
   <body>
     <div class="testbox">
       <form action="{% url 'create' %}" method="post">
+        {% csrf_token %}
         <div class="banner">
           <h1 style="color:black;">Launch Instance</h1>
         </div>
@@ -223,7 +224,7 @@
         </div>
         <div class="item">
           <p>Flavor</p>
-          <select required>
+          <select name="flavor" required>
             <option selected value="" disabled selected></option>
             <option value="t">m1.tiny</option>
             <option value="s">m1.small</option>
@@ -234,7 +235,7 @@
         </div>
         <div class="item">
           <p>Engine</p>
-          <select required>
+          <select name="mq_engine" required>
             <option selected value="" disabled selected></option>
             <option value="rabbitmq">RabbitMQ</option>
             <option value="mosquitto">Mosquitto</option>
@@ -244,11 +245,11 @@
           <label>Do you want a multiple availability zones deployment?</label>
           <div class="question-answer">
             <div>
-              <input type="radio" value="none" id="radio_15" name="contact"/>
+              <input type="radio" value="none" id="radio_15" name="multi_az"/>
               <label for="radio_15" class="radio"><span>Yes</span></label>
             </div>
             <div>
-              <input  type="radio" value="none" id="radio_16" name="contact"/>
+              <input  type="radio" value="none" id="radio_16" name="no_multi_az"/>
               <label for="radio_16" class="radio"><span>No</span></label>
             </div>
           </div>
