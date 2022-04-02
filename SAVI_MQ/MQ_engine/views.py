@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.urls import reverse
 
 instances = [{
     "Name": "Test",
@@ -18,6 +19,17 @@ instances = [{
     "Status": "Active",
 }]
 
+def parse_config(form):
+    config = dict()
+    config["name"] = form["name"]
+    config["key"] = form["key"]
+    config["console_username"] = form["console_username"]
+    config["console_password"] = form["console_password"]
+    config["flavor"] = form["flavor"]
+    config["mq_engine"] = form["mq_engine"]
+    return config
+
+
 def dashboard(request):
     return render(request, "dashboard.html", {
         "instances": instances
@@ -25,7 +37,12 @@ def dashboard(request):
 
 
 def create(request):
-    return render(request, "createForm.html")
+    if request.method == "POST":
+        config = parse_config(request.POST)
+        print(config)
+        return HttpResponseRedirect(reverse("dashboard"))
+    else:
+        return render(request, "createForm.html")
 
 
 def status(request, id):
