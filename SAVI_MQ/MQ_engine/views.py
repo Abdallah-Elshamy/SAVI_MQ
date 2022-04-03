@@ -26,7 +26,8 @@ def parse_config(form):
     config["console_username"] = form["console_username"]
     config["console_password"] = form["console_password"]
     config["flavor"] = form["flavor"]
-    config["mq_engine"] = form["mq_engine"]
+    config["image"] = form["mq_engine"]
+    config["network"] = form["network"]
     return config
 
 

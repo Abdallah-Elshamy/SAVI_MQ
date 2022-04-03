@@ -214,6 +214,10 @@
             <input id="key" type="text" name="key" required/>
           </div>
           <div class="item">
+            <label for="network">Network<span>*</span></label>
+            <input id="network" type="text" name="network" required/>
+          </div>
+          <div class="item">
             <label for="console_username">Console Username<span>*</span></label>
             <input id="console_username" type="text" name="console_username" required/>
           </div>
@@ -226,19 +230,19 @@
           <p>Flavor</p>
           <select name="flavor" required>
             <option selected value="" disabled selected></option>
-            <option value="t">m1.tiny</option>
-            <option value="s">m1.small</option>
-            <option value="m">m1.medium</option>
-            <option value="l">m1.large</option>
-            <option value="xl">m1.xlarge</option>
+            <option value="m1.tiny">m1.tiny</option>
+            <option value="m1.small">m1.small</option>
+            <option value="m1.medium">m1.medium</option>
+            <option value="m1.large">m1.large</option>
+            <option value="m1.xlarge">m1.xlarge</option>
           </select>
         </div>
         <div class="item">
           <p>Engine</p>
           <select name="mq_engine" required>
             <option selected value="" disabled selected></option>
-            <option value="rabbitmq">RabbitMQ</option>
-            <option value="mosquitto">Mosquitto</option>
+            <option value="RabbitMQ">RabbitMQ</option>
+            <option value="Mosquitto">Mosquitto</option>
           </select>
         </div>
         <div class="question">
