@@ -1,6 +1,7 @@
 import time
 import paramiko
 import logging
+import openstack
 
 
 # Set logging format and logging level
@@ -80,3 +81,22 @@ def runCommandOverSSH(sshSession, command):
             logger.debug("%s\n" % out)
 
         return (out, err)
+
+
+def create_server(config):
+    conn = openstack.connect(cloud='savi')
+    logger.debug("Creating server %s" % config["name"])
+
+    image = conn.compute.find_image(config["image"])
+    flavor = conn.compute.find_flavor(config["flavor"])
+    network = conn.network.find_network(config["network"])
+    keypair = conn.compute.find_key_pair(config["key"])
+
+    server = conn.compute.create_server(
+        name=config["name"], image_id=image.id, flavor_id=flavor.id,
+        networks=[{"uuid": network.id}], key_name=keypair.name)
+
+    server = conn.compute.wait_for_server(server)
+    logger.debug("Server %s is active" % config["name"])
+
+    return server
