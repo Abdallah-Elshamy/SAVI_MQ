@@ -1,27 +1,13 @@
+from multiprocessing.dummy import Process
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
+from .savi import launch_mq, list_mqs
 
-instances = [{
-    "Name": "Test",
-    "Endpoint": "1.1.1.1",
-    "DashboardURL": "example.com",
-    "Flavor": "m1.small",
-    "KeyPair": "myKey",
-    "Engine": "RabbitMQ",
-    "Status": "Active",
-},{
-    "Name": "Test",
-    "Endpoint": "1.1.1.1",
-    "Flavor": "m1.small",
-    "KeyPair": "myKey",
-    "Engine": "Mosquitto",
-    "Status": "Active",
-}]
 
 def parse_config(form):
     config = dict()
-    config["name"] = form["name"]
+    config["name"] = "mq-" + form["name"]
     config["key"] = form["key"]
     config["console_username"] = form["console_username"]
     config["console_password"] = form["console_password"]
@@ -33,14 +19,17 @@ def parse_config(form):
 
 def dashboard(request):
     return render(request, "dashboard.html", {
-        "instances": instances
+        "instances": list_mqs()
     })
 
 
 def create(request):
     if request.method == "POST":
         config = parse_config(request.POST)
-        print(config)
+        
+        # Start a process to launch the mq and return to user
+        p = Process(target=launch_mq, args=(config,))
+        p.start()
         return HttpResponseRedirect(reverse("dashboard"))
     else:
         return render(request, "createForm.html")
