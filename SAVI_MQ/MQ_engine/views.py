@@ -2,7 +2,7 @@ from multiprocessing.dummy import Process
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
-from .savi import launch_mq, list_mqs
+from .savi import launch_mq, list_mqs, delete_mq
 
 
 def parse_config(form):
@@ -26,7 +26,6 @@ def dashboard(request):
 def create(request):
     if request.method == "POST":
         config = parse_config(request.POST)
-        
         # Start a process to launch the mq and return to user
         p = Process(target=launch_mq, args=(config,))
         p.start()
@@ -34,6 +33,11 @@ def create(request):
     else:
         return render(request, "createForm.html")
 
+
+def delete(request, id):
+    if request.method == "POST":
+        delete_mq(id)
+        return HttpResponseRedirect(reverse("dashboard"))
 
 def status(request, id):
     return HttpResponse(f"Hello, {id}!")
