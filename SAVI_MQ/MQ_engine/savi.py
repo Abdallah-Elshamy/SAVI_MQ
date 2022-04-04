@@ -107,12 +107,15 @@ def list_mqs():
     conn = openstack.connect(cloud='savi')
     servers = []
     for server in conn.compute.servers():
-        if(server.name.startswith("")):
+        if(server.name.startswith("mq-")):
             addresses = []
             for network in server.addresses.values():
                 for addresses_dict in network:
                     addresses.append(addresses_dict["addr"])
-            dashboards = ["http://" + s + ":15672/" for s in addresses]
+            image = conn.compute.find_image(server.image["id"]).name
+            dashboards = []
+            if image == "RabbitMQ":
+                dashboards = ["http://" + s + ":15672/" for s in addresses]
             servers.append({
                 "id": server.id,
                 "Name": server.name[3:],
@@ -120,7 +123,7 @@ def list_mqs():
                 "DashboardURL": "\n".join(dashboards),
                 "Flavor": server.flavor["original_name"],
                 "KeyPair": server.key_name,
-                "Engine": conn.compute.find_image(server.image["id"]).name,
+                "Engine": image,
                 "Status": server.status,
             })
 
