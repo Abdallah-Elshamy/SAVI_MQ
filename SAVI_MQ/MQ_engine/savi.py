@@ -125,3 +125,8 @@ def list_mqs():
             })
 
     return servers
+
+
+def launch_mq(config):
+    server = create_server(config)
+    # TODO: ssh into the created server and configure the mq
