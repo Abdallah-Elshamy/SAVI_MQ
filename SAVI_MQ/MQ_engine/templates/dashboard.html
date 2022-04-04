@@ -58,7 +58,13 @@ tr:nth-child(even) {
     <td>{{ instance.KeyPair }}</td>
     <td>{{ instance.Engine }}</td>
     <td>{{ instance.Status }}</td>
-    <td><button class="button button-red">Delete</button></td>
+    <td>
+      <form action="{% url 'delete' instance.id %}" method="post">
+        {% csrf_token %}
+        <button class="button button-red" type="submit">Delete</button>
+      </form>
+    </td>
+      
   </tr>
   {% endfor %}
 </table>
