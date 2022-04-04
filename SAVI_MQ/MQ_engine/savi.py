@@ -133,3 +133,8 @@ def list_mqs():
 def launch_mq(config):
     server = create_server(config)
     # TODO: ssh into the created server and configure the mq
+
+
+def delete_mq(id):
+    conn = openstack.connect(cloud='savi')
+    conn.compute.delete_server(id)
