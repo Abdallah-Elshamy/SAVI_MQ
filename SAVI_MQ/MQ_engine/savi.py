@@ -85,18 +85,43 @@ def runCommandOverSSH(sshSession, command):
 
 def create_server(config):
     conn = openstack.connect(cloud='savi')
-    logger.debug("Creating server %s" % config["name"])
+    print("Creating server %s" % config["name"])
+    print(config)
 
     image = conn.compute.find_image(config["image"])
     flavor = conn.compute.find_flavor(config["flavor"])
     network = conn.network.find_network(config["network"])
-    keypair = conn.compute.find_key_pair(config["key"])
+    keypair = conn.compute.find_keypair(config["key"])
 
     server = conn.compute.create_server(
         name=config["name"], image_id=image.id, flavor_id=flavor.id,
         networks=[{"uuid": network.id}], key_name=keypair.name)
 
     server = conn.compute.wait_for_server(server)
-    logger.debug("Server %s is active" % config["name"])
+    print("Server %s is active" % config["name"])
 
     return server
+
+
+def list_mqs():
+    conn = openstack.connect(cloud='savi')
+    servers = []
+    for server in conn.compute.servers():
+        if(server.name.startswith("")):
+            addresses = []
+            for network in server.addresses.values():
+                for addresses_dict in network:
+                    addresses.append(addresses_dict["addr"])
+            dashboards = ["http://" + s + ":15672/" for s in addresses]
+            servers.append({
+                "id": server.id,
+                "Name": server.name[3:],
+                "Endpoint": "\n".join(addresses),
+                "DashboardURL": "\n".join(dashboards),
+                "Flavor": server.flavor["original_name"],
+                "KeyPair": server.key_name,
+                "Engine": conn.compute.find_image(server.image["id"]).name,
+                "Status": server.status,
+            })
+
+    return servers
