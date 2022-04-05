@@ -51,7 +51,7 @@ tr:nth-child(even) {
   </tr>
   {% for instance in instances %}
   <tr>
-    <td>{{ instance.Name }}</td>
+    <td><a href="{% url 'info' instance.id %}">{{ instance.Name }}</a></td>
     <td>{{ instance.Endpoint }}</td>
     <td>{{ instance.DashboardURL }}</td>
     <td>{{ instance.Flavor }}</td>
