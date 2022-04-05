@@ -1,8 +1,8 @@
 from multiprocessing.dummy import Process
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
-from .savi import launch_mq, list_mqs, delete_mq
+from .savi import launch_mq, list_mqs, delete_mq, get_mq_info
 
 
 def parse_config(form):
@@ -39,5 +39,5 @@ def delete(request, id):
         delete_mq(id)
         return HttpResponseRedirect(reverse("dashboard"))
 
-def status(request, id):
-    return HttpResponse(f"Hello, {id}!")
+def info(request, id):
+    return JsonResponse(get_mq_info(id))
