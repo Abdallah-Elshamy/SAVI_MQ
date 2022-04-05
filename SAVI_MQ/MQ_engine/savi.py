@@ -2,6 +2,7 @@ import time
 import paramiko
 import logging
 import openstack
+import json
 
 
 # Set logging format and logging level
@@ -138,3 +139,16 @@ def launch_mq(config):
 def delete_mq(id):
     conn = openstack.connect(cloud='savi')
     conn.compute.delete_server(id)
+
+
+def get_mq_info(id):
+    conn = openstack.connect(cloud='savi')
+    server_dict = dict()
+    server = conn.compute.find_server(id)
+    for field in server:
+        server_dict[field] = server[field]
+    # Delete the fields that contain objects so it can
+    # be serialized to JSON
+    del server["image"]
+    del server["location"]
+    return server
