@@ -2,7 +2,6 @@ import time
 import paramiko
 import logging
 import openstack
-import json
 
 
 # Set logging format and logging level
@@ -38,28 +37,37 @@ def getSSHSession(targetIP, username, password):
     return sshSession
 
 
-# Runs a command over an established SSH session
+# Runs a command that requires sudo access over an established SSH session
 #
 # Input:
 #   - sshSession: An active SSH session to a VM
 #   - command: A string command to run within the VM
+#   - sudoPassword: Password for sudo access
 #
 # Returns:
-#   - A tuple containing strings of stdout and stderr (stdout, stderr), or
-#     else None if an exception occurred from SSH
-def runCommandOverSSH(sshSession, command):
+#   - strings of stdout or else None if an exception occurred from SSH
+def runSudoCommandOverSSH(sshSession, command, sudoPassword):
     assert type(sshSession) is paramiko.client.SSHClient,\
             "'sshSession' is type %s" % type(sshSession)
-    assert type(command) in (str, unicode), "'command' is type %s" % type(command)
+    assert type(command) is str, "'command' is type %s" % type(command)
+    
     logger.debug("Running command in host %s" % sshSession._transport.sock.getpeername()[0])
     logger.debug("\t\"%s\"" % command)
 
     try:
-        stdin, stdout, stderr = sshSession.exec_command(command)
+        transport = sshSession.get_transport()
+        session = transport.open_session()
+        session.set_combine_stderr(True)
+        session.get_pty()
+        session.exec_command(command)
+        stdin = session.makefile('w', -1)
+        stdout = session.makefile('r', -1)
+        # Enter the password for sudo
+        stdin.write(sudoPassword + '\n')
+        stdin.flush()
 
         # Wait for command to finish (may take a while for long commands)
-        while not stdout.channel.exit_status_ready() or \
-                not stderr.channel.exit_status_ready():
+        while not stdout.channel.exit_status_ready():
             time.sleep(1)
     except Exception as e:
         logger.error(e)
@@ -68,20 +76,13 @@ def runCommandOverSSH(sshSession, command):
 
         return None
     else:
-        # exec_command() completed successfully
-        # Check if command printed anything to stderr
-        err = stderr.readlines()
-        err = ''.join(err) # Convert to single string
-        if err:
-            logger.error("%s\n" % err)
-
         # Check if command printed anything to stdout
         out = stdout.readlines()
         out = ''.join(out) # Convert to single string
         if out:
             logger.debug("%s\n" % out)
 
-        return (out, err)
+        return out
 
 
 def create_server(config):
