@@ -85,10 +85,20 @@ def runSudoCommandOverSSH(sshSession, command, sudoPassword):
         return out
 
 
+# Creates a server in the cloud configured in "clouds.yaml"
+#
+# Input: A dict contains the keys:
+#   - name: The name of the server
+#   - image: The name of the image used to create the server
+#   - flavor: The name of the flavor used to create the server
+#   - network: The name of the network that the server will be in
+#   - key: The name of the keypair that can access the server
+#
+# Returns:
+#   - An openstack server object
 def create_server(config):
     conn = openstack.connect(cloud='savi')
-    print("Creating server %s" % config["name"])
-    print(config)
+    logger.debug("Creating server %s" % config["name"])
 
     image = conn.compute.find_image(config["image"])
     flavor = conn.compute.find_flavor(config["flavor"])
@@ -100,14 +110,19 @@ def create_server(config):
         networks=[{"uuid": network.id}], key_name=keypair.name)
 
     server = conn.compute.wait_for_server(server)
-    print("Server %s is active" % config["name"])
+    logger.debug("Server %s is active" % config["name"])
 
     return server
 
 
+# Lists all the created MQs
+#
+# Returns:
+#   - A list of openstack server objects
 def list_mqs():
     conn = openstack.connect(cloud='savi')
     servers = []
+    logger.debug("Listing all MQs")
     for server in conn.compute.servers():
         if(server.name.startswith("mq-")):
             addresses = []
@@ -138,7 +153,19 @@ def list_mqs():
     return servers
 
 
+# Launches and configures an MQ
+#
+# Input: A dict contains the keys:
+#   - name: The name of the server
+#   - image: The name of the image used to create the server
+#   - flavor: The name of the flavor used to create the server
+#   - network: The name of the network that the server will be in
+#   - key: The name of the keypair that can access the server
+# If the broker is RabbitMQ, it will also contain the keys:
+#   - console_username: The username of the admin user for RabbitMQ management console
+#   - console_username: The password of the admin user for RabbitMQ management console
 def launch_mq(config):
+    logger.debug(f"Launching {config['name']}")
     server = create_server(config)
     server_ip = list(server.addresses.values())[0][0]["addr"]
     # ssh into the created server and configure the mq if the broker 
@@ -153,12 +180,25 @@ def launch_mq(config):
         runSudoCommandOverSSH(sshSession, command, "mqadmin")
 
 
+# Deletes an MQ
+#
+# Input:
+#   - id: The id of the server that hosts the MQ
 def delete_mq(id):
+    logger.debug(f"Deleting {id}")
     conn = openstack.connect(cloud='savi')
     conn.compute.delete_server(id)
 
 
+# Gets detailed info about an MQ
+#
+# Input:
+#   - id: The id of the server that hosts the MQ
+#
+# Returns:
+#   - A dict that contains the info of the MQ
 def get_mq_info(id):
+    logger.debug(f"Getting the info of {id}")
     conn = openstack.connect(cloud='savi')
     server_dict = dict()
     server = conn.compute.find_server(id)
