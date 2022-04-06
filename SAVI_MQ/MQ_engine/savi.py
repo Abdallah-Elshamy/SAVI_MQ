@@ -134,7 +134,17 @@ def list_mqs():
 
 def launch_mq(config):
     server = create_server(config)
-    # TODO: ssh into the created server and configure the mq
+    server_ip = list(server.addresses.values())[0][0]["addr"]
+    # ssh into the created server and configure the mq if the broker 
+    # is rabbitmq
+    if config["image"] == "RabbitMQ":
+        sshSession = getSSHSession(server_ip, "mqadmin", "mqadmin")
+    
+        command = (f"sudo rabbitmqctl add_user -- {config['console_username']} {config['console_password']} &&"
+                   f"sudo rabbitmqctl set_user_tags {config['console_username']} administrator &&"
+                   f"sudo rabbitmqctl set_permissions -p / {config['console_username']} \".*\" \".*\" \".*\"")
+    
+        runSudoCommandOverSSH(sshSession, command, "mqadmin")
 
 
 def delete_mq(id):
