@@ -116,8 +116,14 @@ def list_mqs():
                     addresses.append(addresses_dict["addr"])
             image = conn.compute.find_image(server.image["id"]).name
             dashboards = []
+            # Add port number to a broker's IP
+            port = ""
             if image == "RabbitMQ":
                 dashboards = ["http://" + s + ":15672/" for s in addresses]
+                port = ":5672"
+            elif image == "Mosquitto":
+                port = ":1883"
+            addresses = [s + port for s in addresses]
             servers.append({
                 "id": server.id,
                 "Name": server.name[3:],
