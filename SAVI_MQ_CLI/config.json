@@ -1,0 +1,7 @@
+{
+    "name":"test-mosquitto",
+    "image":"Mosquitto",
+    "flavor":"m1.medium",
+    "network": "workshop-1-net",
+    "key": "netsoft1key"
+}
