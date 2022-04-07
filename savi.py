@@ -165,6 +165,7 @@ def list_mqs():
 #   - console_username: The username of the admin user for RabbitMQ management console
 #   - console_username: The password of the admin user for RabbitMQ management console
 def launch_mq(config):
+    config['name'] = "mq-" + config['name'] 
     logger.debug(f"Launching {config['name']}")
     server = create_server(config)
     server_ip = list(server.addresses.values())[0][0]["addr"]

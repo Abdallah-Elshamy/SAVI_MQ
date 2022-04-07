@@ -10,7 +10,7 @@ from savi import launch_mq, list_mqs, delete_mq, get_mq_info
 
 def parse_config(form):
     config = dict()
-    config["name"] = "mq-" + form["name"]
+    config["name"] = form["name"]
     config["key"] = form["key"]
     config["console_username"] = form["console_username"]
     config["console_password"] = form["console_password"]
