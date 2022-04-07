@@ -2,7 +2,10 @@ from multiprocessing.dummy import Process
 from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
-from .savi import launch_mq, list_mqs, delete_mq, get_mq_info
+
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+from savi import launch_mq, list_mqs, delete_mq, get_mq_info
 
 
 def parse_config(form):
