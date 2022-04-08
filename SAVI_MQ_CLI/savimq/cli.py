@@ -42,6 +42,44 @@ def launch(
         f.close()
 
 
+@app.command()
+def list() -> None:
+    """Launches an MQ from a JSON config file."""
+    try:
+        mqs = list_mqs()
+        typer.secho("\nInstances:\n", fg=typer.colors.BLUE, bold=True)
+        columns = [
+            "Name          ", 
+            "| Endpoint           ",
+            "| Dashboard URL              ",
+            "| Flavor            ",
+            "| Key Pair        ",
+            "| Engine          ",
+            "| Status         ",
+        ]
+        headers = "".join(columns)
+        typer.secho(headers, fg=typer.colors.BLUE, bold=True)
+        typer.secho("-" * len(headers), fg=typer.colors.BLUE)
+        for mq in mqs:
+            typer.secho(
+                f"{mq['Name']}{(len(columns[0]) - len(mq['Name'])) * ' '}"
+                f"| {mq['Endpoint']}{(len(columns[1]) - len(mq['Endpoint']) - 2) * ' '}"
+                f"| {mq['DashboardURL']}{(len(columns[2]) - len(mq['DashboardURL']) - 2) * ' '}"
+                f"| {mq['Flavor']}{(len(columns[3]) - len(mq['Flavor']) - 2) * ' '}"
+                f"| {mq['KeyPair']}{(len(columns[4]) - len(mq['KeyPair']) - 2) * ' '}"
+                f"| {mq['Engine']}{(len(columns[5]) - len(mq['Engine']) - 2) * ' '}"
+                f"| {mq['Status']}",
+                fg=typer.colors.BLUE,
+            )
+        typer.secho("-" * len(headers) + "\n", fg=typer.colors.BLUE)
+    except:
+        typer.secho(
+            'An error occured.',
+            fg=typer.colors.RED,
+        )
+        raise typer.Exit(1)
+
+
 def _version_callback(value: bool) -> None:
     if value:
         typer.echo(f"{__app_name__} v{__version__}")
