@@ -1,3 +1,4 @@
+from textwrap import indent
 from typing import Optional
 import typer
 from . import __app_name__, __version__
@@ -72,6 +73,28 @@ def list() -> None:
                 fg=typer.colors.BLUE,
             )
         typer.secho("-" * len(headers) + "\n", fg=typer.colors.BLUE)
+    except:
+        typer.secho(
+            'An error occured.',
+            fg=typer.colors.RED,
+        )
+        raise typer.Exit(1)
+
+
+@app.command()
+def info(
+    mq : str = typer.Argument(...),
+) -> None:
+    """Launches an MQ from a JSON config file."""
+    try:
+        server_info = json.dumps(get_mq_info("mq-" + mq), indent=4)
+        if server_info == "null\n":
+            typer.secho(server_info, fg=typer.colors.BLUE)
+        else:
+            typer.secho(
+                'There is no mq with the given name/id',
+                fg=typer.colors.RED,
+            )
     except:
         typer.secho(
             'An error occured.',
