@@ -45,7 +45,7 @@ def launch(
 
 @app.command()
 def list() -> None:
-    """Launches an MQ from a JSON config file."""
+    """Lists the existing MQs"""
     try:
         mqs = list_mqs()
         typer.secho("\nInstances:\n", fg=typer.colors.BLUE, bold=True)
@@ -85,16 +85,31 @@ def list() -> None:
 def info(
     mq : str = typer.Argument(...),
 ) -> None:
-    """Launches an MQ from a JSON config file."""
+    """Prints detailed information about an MQ."""
     try:
         server_info = json.dumps(get_mq_info("mq-" + mq), indent=4)
-        if server_info == "null\n":
+        if server_info != "null\n":
             typer.secho(server_info, fg=typer.colors.BLUE)
         else:
             typer.secho(
                 'There is no mq with the given name/id',
                 fg=typer.colors.RED,
             )
+    except:
+        typer.secho(
+            'An error occured.',
+            fg=typer.colors.RED,
+        )
+        raise typer.Exit(1)
+
+
+@app.command()
+def delete(
+    id : str = typer.Argument(...),
+) -> None:
+    """Deletes the MQ with the given ID"""
+    try:
+        delete_mq(id)
     except:
         typer.secho(
             'An error occured.',
