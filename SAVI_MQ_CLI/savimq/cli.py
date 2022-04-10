@@ -6,7 +6,7 @@ import json
 
 import sys, os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
-from savi import launch_mq, list_mqs, delete_mq, get_mq_info
+from savi_mq_engine import launch_mq, list_mqs, delete_mq, get_mq_info
 
 app = typer.Typer()
 
