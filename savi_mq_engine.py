@@ -161,25 +161,39 @@ def list_mqs():
 #   - flavor: The name of the flavor used to create the server
 #   - network: The name of the network that the server will be in
 #   - key: The name of the keypair that can access the server
-# If the broker is RabbitMQ, it will also contain the keys:
-#   - admin_username: The username of the admin user for RabbitMQ management plugin
-#   - admin_password: The password of the admin user for RabbitMQ management plugin
+#   - admin_username: The username of the admin user to access the broker
+#   - admin_password: The password of the admin user to access the broker
 def launch_mq(config):
     config['name'] = "mq-" + config['name'] 
     logger.debug(f"Launching {config['name']}")
     server = create_server(config)
     server_ip = list(server.addresses.values())[0][0]["addr"]
-    # ssh into the created server and configure the mq if the broker 
-    # is rabbitmq
+    config_command = ""
     if config["image"] == "RabbitMQ":
-        sshSession = getSSHSession(server_ip, "mqadmin", "mqadmin")
         # Wait for RabbitMQ to start up then add the admin user
-        command = (f"sudo rabbitmqctl await_startup && "
-                   f"sudo rabbitmqctl add_user -- {config['admin_username']} {config['admin_password']} && "
-                   f"sudo rabbitmqctl set_user_tags {config['admin_username']} administrator && "
-                   f"sudo rabbitmqctl set_permissions -p / {config['admin_username']} \".*\" \".*\" \".*\"")
-    
-        runSudoCommandOverSSH(sshSession, command, "mqadmin")
+        config_command = (f"sudo rabbitmqctl await_startup && "
+            # Add the user to Rabbit mq
+            f"sudo rabbitmqctl add_user -- {config['admin_username']} {config['admin_password']} && "
+            # Add the adminstrator tag to the user
+            f"sudo rabbitmqctl set_user_tags {config['admin_username']} administrator && "
+            # Give admin permissions to the user
+            f"sudo rabbitmqctl set_permissions -p / {config['admin_username']} \".*\" \".*\" \".*\"")
+    elif config["image"] == "Mosquitto":
+        config_command = ("cd /var/snap/mosquitto/common && "
+            # Create configuration and password files for mosquitto
+            "sudo touch mosquitto.conf && sudo touch savi && "
+            # Add the user and password to the password file
+            f"sudo mosquitto_passwd -b savi {config['admin_username']} {config['admin_password']} && "
+            # Configure Mosquitto to listen for remote connecetions on port 1883
+            "echo 'listener 1883' | sudo tee -a mosquitto.conf && "
+            # Configure Mosquitto to use the password file
+            "echo 'password_file /var/snap/mosquitto/common/savi' | sudo tee -a mosquitto.conf"
+            # Restart the mosquitto service to apply the configurations
+            " && sudo snap restart mosquitto")
+
+    # ssh into the created server and configure the mq
+    sshSession = getSSHSession(server_ip, "mqadmin", "mqadmin")
+    logger.debug(runSudoCommandOverSSH(sshSession, config_command, "mqadmin"))
 
 
 # Deletes an MQ
