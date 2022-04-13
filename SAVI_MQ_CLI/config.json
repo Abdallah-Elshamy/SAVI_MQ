@@ -3,5 +3,7 @@
     "image":"Mosquitto",
     "flavor":"m1.medium",
     "network": "workshop-1-net",
-    "key": "netsoft1key"
+    "key": "netsoft1key",
+    "admin_username": "admin",
+    "admin_password": "admin"
 }
