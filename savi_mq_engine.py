@@ -118,7 +118,7 @@ def create_server(config):
 # Lists all the created MQs
 #
 # Returns:
-#   - A list of openstack server objects
+#   - A list of the existing mqs
 def list_mqs():
     conn = openstack.connect(cloud='savi')
     servers = []
@@ -162,8 +162,8 @@ def list_mqs():
 #   - network: The name of the network that the server will be in
 #   - key: The name of the keypair that can access the server
 # If the broker is RabbitMQ, it will also contain the keys:
-#   - console_username: The username of the admin user for RabbitMQ management console
-#   - console_username: The password of the admin user for RabbitMQ management console
+#   - admin_username: The username of the admin user for RabbitMQ management plugin
+#   - admin_password: The password of the admin user for RabbitMQ management plugin
 def launch_mq(config):
     config['name'] = "mq-" + config['name'] 
     logger.debug(f"Launching {config['name']}")
@@ -173,10 +173,10 @@ def launch_mq(config):
     # is rabbitmq
     if config["image"] == "RabbitMQ":
         sshSession = getSSHSession(server_ip, "mqadmin", "mqadmin")
-    
-        command = (f"sudo rabbitmqctl add_user -- {config['console_username']} {config['console_password']} &&"
-                   f"sudo rabbitmqctl set_user_tags {config['console_username']} administrator &&"
-                   f"sudo rabbitmqctl set_permissions -p / {config['console_username']} \".*\" \".*\" \".*\"")
+        
+        command = (f"sudo rabbitmqctl add_user -- {config['admin_username']} {config['admin_password']} && "
+                   f"sudo rabbitmqctl set_user_tags {config['admin_username']} administrator && "
+                   f"sudo rabbitmqctl set_permissions -p / {config['admin_username']} \".*\" \".*\" \".*\"")
     
         runSudoCommandOverSSH(sshSession, command, "mqadmin")
 

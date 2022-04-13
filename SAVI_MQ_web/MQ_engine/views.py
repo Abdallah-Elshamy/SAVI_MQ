@@ -12,8 +12,8 @@ def parse_config(form):
     config = dict()
     config["name"] = form["name"]
     config["key"] = form["key"]
-    config["console_username"] = form["console_username"]
-    config["console_password"] = form["console_password"]
+    config["admin_username"] = form["admin_username"]
+    config["admin_password"] = form["admin_password"]
     config["flavor"] = form["flavor"]
     config["image"] = form["mq_engine"]
     config["network"] = form["network"]
