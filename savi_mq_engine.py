@@ -173,8 +173,9 @@ def launch_mq(config):
     # is rabbitmq
     if config["image"] == "RabbitMQ":
         sshSession = getSSHSession(server_ip, "mqadmin", "mqadmin")
-        
-        command = (f"sudo rabbitmqctl add_user -- {config['admin_username']} {config['admin_password']} && "
+        # Wait for RabbitMQ to start up then add the admin user
+        command = (f"sudo rabbitmqctl await_startup && "
+                   f"sudo rabbitmqctl add_user -- {config['admin_username']} {config['admin_password']} && "
                    f"sudo rabbitmqctl set_user_tags {config['admin_username']} administrator && "
                    f"sudo rabbitmqctl set_permissions -p / {config['admin_username']} \".*\" \".*\" \".*\"")
     
